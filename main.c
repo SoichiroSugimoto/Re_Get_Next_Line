@@ -27,4 +27,5 @@ int	main(void)
 			break ;
 		}
 	}
+	// system("leaks a.out");
 }

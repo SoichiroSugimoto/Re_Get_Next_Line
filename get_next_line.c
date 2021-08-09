@@ -18,79 +18,86 @@ int	find_newline_code(char *str)
 	return (ERROR);
 }
 
-int	free_join(char **dst, char **src1, char **src2)
+int	free_join(char **dst, char **src, int n)
 {
 	int		i;
 	char	*tmp;
 
 	i = 0;
-	if (!(*src1))
-		*src1 = "";
+	if (!(*dst))
+		*dst = "";
+	if (!(*src))
+		*src = "";
 	tmp = *dst;
-	*dst = ft_strjoin(*src1, *src2);
-	// error_free(&tmp);
-	// all_error_free(src1, src2);
+	*dst = ft_strjoin(*dst, *src);
+	if (n != 0)
+		error_free(&tmp);
 	if (dst == NULL)
 		return (ERROR);
 	else
 		return (SUCCESS);
 }
 
-int	cpy_line(char ***line, char **save, char **buf)
+int	len_cpy_line(char *save)
+{
+	int	len;
+
+	len = find_newline_code(save) + 1;
+	if (find_newline_code(save) == -2)
+		len = ft_strlen(save) + 1;
+	return (len);
+}
+
+int	cpy_line(char ***line, char **save, char **buf, int n)
 {
 	int		i;
 	int		len;
-	char	*emp;
 	char	*tmp;
 
 	i = 1;
-	emp = "";
-	len = find_newline_code(*save) + 1;
+	len = len_cpy_line(*save);
 	if (find_newline_code(*save) == -2)
-	{
-		// printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
-		len = ft_strlen(*save) + 1;
-		if (ft_strlen(*save) == 0)
-			len = 0;
 		i = 0;
-	}
 	**line = (char *)malloc(sizeof(char) * len);
 	if (**line == NULL)
 		return (all_error_free(buf, save));
-	// printf("+++++++++++++++++++++++++len:    %d++++++++++++++++++++++++++++++++\n", len);
-	ft_strlcpy(**line, *save, len);/////
+	ft_strlcpy(**line, *save, len);
 	tmp = *save;
-	*save = ft_strjoin(*(save) + len, emp);
-	if (*save == NULL)
-		return (all_error_free(buf, save));
-	// printf("        emp: %zu\n", ft_strlen(emp));//////////////////
-	error_free(&tmp);
+	if (find_newline_code(*save) != -2)
+	{
+		*save = ft_strjoin(*(save) + len, "");
+		if (*save == NULL)
+			return (error_free(buf));
+	}
+	if (n != 0)
+		error_free(&tmp);
 	return (i);
 }
 
 int	get_next_line(int fd, char **line)
 {
-	static char	*save;
-	char		*buf;
-	int			i;
-	size_t		size;
+	static char		*save;
+	static int		n;
+	char			*buf;
+	int				i;
+	size_t			size;
 
 	size = 1;
 	i = 0;
 	buf = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
 	if (!line || BUFFER_SIZE <= 0 || fd < 0 || buf == NULL)
-		return (ERROR);
+		return (error_free(&buf));
 	while (find_newline_code(save) < 0 && size > 0)
 	{
 		size = read(fd, buf, BUFFER_SIZE);
 		if ((int)size == -1)
-			return (all_error_free(&buf, &save));
+			return (error_free(&buf));
 		buf[size] = '\0';
-		i = free_join(&save, &save, &buf);
+		i = free_join(&save, &buf, n);
 		if (i == -1)
 			return (all_error_free(&buf, &save));
+		n++;
 	}
 	error_free(&buf);
-	// printf("<<<<<save>>>>>: %s\n", save);
-	return (cpy_line(&line, &save, &buf));
+	return (cpy_line(&line, &save, &buf, n));
 }
