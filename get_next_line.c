@@ -43,34 +43,40 @@ int	len_cpy_line(char *save)
 	int	len;
 
 	len = find_newline_code(save) + 1;
+	if (len > (int)ft_strlen(save))
+		len = (int)ft_strlen(save);
 	if (find_newline_code(save) == -2)
 		len = ft_strlen(save) + 1;
+	if (find_newline_code(save) == -2 && ft_strlen(save) == 0)
+		len = 0;
 	return (len);
 }
 
-int	cpy_line(char ***line, char **save, char **buf, int n)
+int	cpy_line(char ***line, char **save)
 {
 	int		i;
-	int		len;
+	int		l1;
+	int		l2;
 	char	*tmp;
 
 	i = 1;
-	len = len_cpy_line(*save);
+	l1 = len_cpy_line(*save);
+	l2 = len_cpy_line(*save);
+	if (l2 == 0)
+		l2 = 1;
 	if (find_newline_code(*save) == -2)
 		i = 0;
-	**line = (char *)malloc(sizeof(char) * len);
+	**line = (char *)malloc(sizeof(char) * l2);
 	if (**line == NULL)
-		return (all_error_free(buf, save));
-	ft_strlcpy(**line, *save, len);
+		return (error_free(save));
+	ft_strlcpy(**line, *save, l2);
 	tmp = *save;
-	if (find_newline_code(*save) != -2)
-	{
-		*save = ft_strjoin(*(save) + len, "");
-		if (*save == NULL)
-			return (error_free(buf));
-	}
-	if (n != 0)
-		error_free(&tmp);
+	if (find_newline_code(*save) == -2)
+		l1 = ft_strlen(*save);
+	*save = ft_strjoin(*(save) + l1, "");
+	if (*save == NULL)
+		return (ERROR);
+	error_free(&tmp);
 	return (i);
 }
 
@@ -95,9 +101,10 @@ int	get_next_line(int fd, char **line)
 		buf[size] = '\0';
 		i = free_join(&save, &buf, n);
 		if (i == -1)
-			return (all_error_free(&buf, &save));
+			return (error_free(&save));
 		n++;
 	}
-	error_free(&buf);
-	return (cpy_line(&line, &save, &buf, n));
+	if (n != 0)
+		error_free(&buf);
+	return (cpy_line(&line, &save));
 }
