@@ -14,6 +14,7 @@
 # include <stdio.h>
 
 int		error_free(char **buf);
+int		final_free(char **save, int i);
 int		all_error_free(char **s1, char **s2);
 size_t	ft_strlen(const char *s);
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize);

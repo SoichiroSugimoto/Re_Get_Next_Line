@@ -16,6 +16,13 @@ int	error_free(char **buf)
 	return (ERROR);
 }
 
+int	final_free(char **save, int i)
+{
+	if (i == 0)
+		free(*save);
+	return (i);
+}
+
 size_t	ft_strlen(const char *s)
 {
 	int		i;
