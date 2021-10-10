@@ -95,8 +95,6 @@ int	get_next_line(int fd, char **line)
 		return (error_free(&buf));
 	while (find_newline_code(save) < 0 && size > 0)
 	{
-		// if (size == 0)
-		// 	printf("size == 0\n");
 		size = read(fd, buf, BUFFER_SIZE);
 		if ((int)size == -1)
 			return (error_free(&buf));
